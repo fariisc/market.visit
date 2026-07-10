@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Executive Market Visit Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for a cleaner UI */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fef2f2; }
+        ::-webkit-scrollbar-thumb { background: #fca5a5; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-50 via-white to-red-100 min-h-screen p-4 md:p-8 font-sans text-gray-800">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl shadow-red-200/50 overflow-hidden p-6 md:p-8 mb-8 border border-red-50">
+        <div class="flex items-center mb-8 border-b border-red-100 pb-4">
+            <div class="bg-red-600 p-3 rounded-lg mr-4 shadow-lg shadow-red-200">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </div>
+            <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-700 to-red-500">Market Visit Tracker</h1>
+        </div>
+        
+        <form id="visitForm" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Sales Person Name <span class="text-red-500">*</span></label>
+                    <input type="text" id="salesPerson" required class="block w-full rounded-lg border-gray-300 bg-gray-50 border p-3 focus:bg-white focus:border-red-500 focus:ring-red-500 transition-colors shadow-sm">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Select Sub-Dealer <span class="text-red-500">*</span></label>
+                    <select id="subDealerSelect" required class="block w-full rounded-lg border-gray-300 bg-gray-50 border p-3 focus:bg-white focus:border-red-500 focus:ring-red-500 transition-colors shadow-sm">
+                        <option value="">-- Choose a Sub-Dealer --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gradient-to-r from-red-50 to-white p-5 rounded-xl border border-red-100 shadow-inner">
+                <div>
+                    <label class="block text-xs font-bold text-red-400 uppercase tracking-wider mb-1">Dealer Code</label>
+                    <input type="text" id="dealerCode" readonly class="block w-full bg-transparent border-none text-sm font-bold text-gray-800 p-0 focus:ring-0">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-red-400 uppercase tracking-wider mb-1">Location</label>
+                    <input type="text" id="dealerLocation" readonly class="block w-full bg-transparent border-none text-sm font-bold text-gray-800 p-0 focus:ring-0">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-red-400 uppercase tracking-wider mb-1">Region</label>
+                    <input type="text" id="dealerRegion" readonly class="block w-full bg-transparent border-none text-sm font-bold text-gray-800 p-0 focus:ring-0">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-red-400 uppercase tracking-wider mb-1">Zone</label>
+                    <input type="text" id="dealerZone" readonly class="block w-full bg-transparent border-none text-sm font-bold text-gray-800 p-0 focus:ring-0">
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">Real Location (GPS) <span class="text-red-500">*</span></label>
+                <div class="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                    <button type="button" onclick="getLocation()" class="flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-700 font-bold py-2.5 px-5 rounded-lg border border-red-200 transition duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Capture Coordinates
+                    </button>
+                    <span id="locationStatus" class="text-sm font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-md border border-gray-100">Awaiting GPS capture...</span>
+                </div>
+                <input type="hidden" id="lat">
+                <input type="hidden" id="lng">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Visit Notes / Remarks</label>
+                <textarea id="notes" rows="2" class="block w-full rounded-lg border-gray-300 bg-gray-50 border p-3 focus:bg-white focus:border-red-500 focus:ring-red-500 transition-colors shadow-sm"></textarea>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-red-200/50 transform transition hover:-translate-y-0.5">
+                    Submit Visit Log
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl shadow-red-200/50 overflow-hidden p-6 md:p-8 border border-red-50">
+        
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                <svg class="w-6 h-6 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Visit History Dashboard
+            </h2>
+            <div class="flex items-center space-x-3">
+                <button onclick="refreshLogs()" id="refreshBtn" class="bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2 px-4 rounded-lg text-sm shadow-md border border-gray-200 transition flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Refresh
+                </button>
+                <button onclick="exportToCSV()" class="bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-5 rounded-lg text-sm shadow-md transition flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Export Filtered Data
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-red-50/50 p-4 rounded-xl border border-red-100">
+            <div>
+                <label class="block text-xs font-bold text-red-600 uppercase mb-1">Filter by Year</label>
+                <select id="filterYear" class="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-red-500 focus:ring-red-500">
+                    <option value="">All Years</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-red-600 uppercase mb-1">Filter by Month</label>
+                <select id="filterMonth" class="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-red-500 focus:ring-red-500">
+                    <option value="">All Months</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-red-600 uppercase mb-1">Filter by Sales Person</label>
+                <select id="filterPerson" class="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-red-500 focus:ring-red-500">
+                    <option value="">All Staff</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-lg border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gradient-to-r from-red-50 to-white">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-red-700 uppercase tracking-wider">Date & Time</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-red-700 uppercase tracking-wider">Sales Person</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-red-700 uppercase tracking-wider">Sub-Dealer Info</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-red-700 uppercase tracking-wider">Map Link</th>
+                    </tr>
+                </thead>
+                <tbody id="logsTableBody" class="bg-white divide-y divide-gray-100 text-sm">
+                    </tbody>
+            </table>
+            
+            <div id="emptyState" class="hidden text-center py-10">
+                <p class="text-gray-500 font-medium">No visit logs match the current filters.</p>
+            </div>
+            <div id="loadingState" class="text-center py-10">
+                <p class="text-gray-500 font-medium">Loading visit logs...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Extraction (Combined from your paste & image extraction)
+        const subDealers = [
+            {'Code': 'S00001', 'Sub Dealer Name': 'A.J ASSOCIATES', 'Location': 'NANMANDA', 'Region': 'BALUSSERY', 'Zone': 'Kozhikode North'}, 
+            {'Code': 'S00002', 'Sub Dealer Name': 'A.K TRADERS, VANIMAL', 'Location': 'VANIMAL', 'Region': 'VALAYAM', 'Zone': 'Kozhikode North'}, 
+            {'Code': 'S00003', 'Sub Dealer Name': 'ADITHYA STEELS, MEPPAYOOR', 'Location': 'MEPPAYOOR', 'Region': 'MEPPAYUR', 'Zone': 'Kozhikode North'}, 
+            {'Code': 'S00004', 'Sub Dealer Name': 'AISWARYA STEEL, KATTILPEEDIKA', 'Location': 'KATTILPEEDIKA', 'Region': 'ATHOLI', 'Zone': 'Kozhikode South'}, 
+            {'Code': 'S00005', 'Sub Dealer Name': 'AISWARYA STEEL, PARAMBATH', 'Location': 'PARAMBATH', 'Region': 'ATHOLI', 'Zone': 'Kozhikode South'}, 
+            {'Code': 'S00006', 'Sub Dealer Name': 'ALAMEEN TRADERS', 'Location': 'PALLIYATH KUNI', 'Region': 'NADUVANNUR', 'Zone': 'Kozhikode North'}, 
+            {'Code': 'S00010', 'Sub Dealer Name': 'ARIFA AGENCIES', 'Location': 'NADUVANNUR', 'Region': 'NADUVANNUR', 'Zone': 'Kozhikode North'}, 
+            {'Code': 'S00012', 'Sub Dealer Name': 'ASHAR AGENCY', 'Location': 'ATHOLI', 'Region': 'ATHOLI', 'Zone': 'Kozhikode South'}, 
+            {'Code': 'S00013', 'Sub Dealer Name': 'B.V.CEMENT AND HARDWARES', 'Location': 'MUTTANCHERRY', 'Region': 'NARIKKUNI', 'Zone': 'Kozhikode South'}, 
+            {'Code': 'S00014', 'Sub Dealer Name': 'BHARATH BUILDING MATERIALS', 'Location': 'EDACHERI', 'Region': 'ORKKATTERI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00029', 'Sub Dealer Name': 'CIVIC STEEL & CEMENT', 'Location': 'KARAMPARAMBA', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00046', 'Sub Dealer Name': 'GLOBAL BAZAR', 'Location': 'KODUVALLY', 'Region': 'KODUVALLY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00497', 'Sub Dealer Name': 'STEEL HOUSE-THODUPUZHA', 'Location': 'THODUPUZHA', 'Region': '', 'Zone': 'Not Assigned'},
+            {'Code': 'S00498', 'Sub Dealer Name': 'WHITE LINE STEEL', 'Location': 'MANJERI', 'Region': 'MANJERI-MALAPPURAM', 'Zone': 'Malappuram North'},
+            {'Code': 'S00499', 'Sub Dealer Name': 'SR STEELS', 'Location': 'GROUND FLOOR,18/467,UNIVERSITY ROAD,THOTTUNGAL,', 'Region': '', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00500', 'Sub Dealer Name': 'BUILD HUB', 'Location': 'MUNDERIMOTTA', 'Region': '', 'Zone': 'Kannur'}
+        ];
+
+        // >>> PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE <<<
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVDMqTXZddn_E_YWhYzB9gOQaTaUR9vPFTGQrjo3Tx_G1dBkRqws6U1czu8L4aYbV2/exec";
+
+        // Global state
+        let allLogsCache = [];
+        let currentFilteredLogs = [];
+
+        // 1. Populate Dealer Dropdown
+        const select = document.getElementById('subDealerSelect');
+        subDealers.forEach((dealer, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = dealer['Sub Dealer Name'];
+            select.appendChild(option);
+        });
+
+        // 2. Auto-fill Data when Sub-Dealer is selected
+        select.addEventListener('change', function() {
+            if(this.value === "") {
+                document.getElementById('dealerCode').value = "";
+                document.getElementById('dealerLocation').value = "";
+                document.getElementById('dealerRegion').value = "";
+                document.getElementById('dealerZone').value = "";
+                return;
+            }
+            const selected = subDealers[this.value];
+            document.getElementById('dealerCode').value = selected['Code'];
+            document.getElementById('dealerLocation').value = selected['Location'];
+            document.getElementById('dealerRegion').value = selected['Region'];
+            document.getElementById('dealerZone').value = selected['Zone'];
+        });
+
+        // 3. Geolocation API
+        function getLocation() {
+            const status = document.getElementById('locationStatus');
+            status.textContent = "Requesting satellite fix...";
+            status.className = "text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1.5 rounded-md border border-blue-200 animate-pulse";
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        document.getElementById('lat').value = lat;
+                        document.getElementById('lng').value = lng;
+                        status.innerHTML = `<span class="flex items-center"><svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}</span>`;
+                        status.className = "text-sm font-bold text-green-700 bg-green-50 px-3 py-1.5 rounded-md border border-green-200";
+                    },
+                    (error) => {
+                        status.textContent = "Error: Allow location access.";
+                        status.className = "text-sm font-bold text-red-700 bg-red-50 px-3 py-1.5 rounded-md border border-red-200";
+                    }
+                );
+            } else {
+                status.textContent = "Not supported by browser.";
+            }
+        }
+
+        // 4. Fetch logs from Google Sheet backend
+        async function fetchLogs() {
+            document.getElementById('loadingState').classList.remove('hidden');
+            try {
+                const res = await fetch(SCRIPT_URL);
+                const data = await res.json();
+                allLogsCache = data.map(log => {
+                    const ts = log.Timestamp || log.timestamp || "";
+                    const parsedDate = new Date(ts);
+                    return {
+                        timestamp: ts,
+                        isoTimestamp: isNaN(parsedDate) ? "" : parsedDate.toISOString(),
+                        salesPerson: log.SalesPerson || log.salesPerson,
+                        dealerName: log.DealerName || log.dealerName,
+                        dealerCode: log.DealerCode || log.dealerCode,
+                        location: log.Location || log.location,
+                        region: log.Region || log.region,
+                        zone: log.Zone || log.zone,
+                        lat: log.Lat || log.lat,
+                        lng: log.Lng || log.lng,
+                        notes: log.Notes || log.notes
+                    };
+                }).reverse(); // newest first
+            } catch (err) {
+                console.error("Failed to fetch logs:", err);
+                alert("Could not load visit logs. Check your internet connection or Web App URL.");
+            }
+            document.getElementById('loadingState').classList.add('hidden');
+        }
+
+        async function refreshLogs() {
+            const btn = document.getElementById('refreshBtn');
+            btn.disabled = true;
+            btn.textContent = "Refreshing...";
+            await fetchLogs();
+            updateTable();
+            btn.disabled = false;
+            btn.innerHTML = `<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Refresh`;
+        }
+
+        // 5. Update Filter Dropdown Options
+        function updateFilterOptions() {
+            const years = new Set();
+            const months = new Set();
+            const persons = new Set();
+
+            allLogsCache.forEach(log => {
+                const date = new Date(log.isoTimestamp || log.timestamp);
+                if(!isNaN(date)) {
+                    years.add(date.getFullYear());
+                    months.add(date.toLocaleString('default', { month: 'short' }) + ' ' + date.getFullYear());
+                }
+                persons.add(log.salesPerson);
+            });
+
+            const populateSelect = (selectId, setValues, defaultText) => {
+                const selectEl = document.getElementById(selectId);
+                const currentVal = selectEl.value;
+                selectEl.innerHTML = `<option value="">${defaultText}</option>`;
+                
+                Array.from(setValues).sort().forEach(val => {
+                    const option = document.createElement('option');
+                    option.value = val;
+                    option.textContent = val;
+                    if(val == currentVal) option.selected = true;
+                    selectEl.appendChild(option);
+                });
+            };
+
+            populateSelect('filterYear', years, 'All Years');
+            populateSelect('filterMonth', months, 'All Months');
+            populateSelect('filterPerson', persons, 'All Staff');
+        }
+
+        // 6. Apply Filters & Update UI Table
+        function updateTable() {
+            updateFilterOptions();
+
+            const yearFilter = document.getElementById('filterYear').value;
+            const monthFilter = document.getElementById('filterMonth').value;
+            const personFilter = document.getElementById('filterPerson').value;
+
+            currentFilteredLogs = allLogsCache.filter(log => {
+                const date = new Date(log.isoTimestamp || log.timestamp);
+                
+                let matchYear = true;
+                let matchMonth = true;
+                let matchPerson = true;
+
+                if (yearFilter && !isNaN(date)) {
+                    matchYear = date.getFullYear().toString() === yearFilter;
+                }
+                if (monthFilter && !isNaN(date)) {
+                    const logMonthStr = date.toLocaleString('default', { month: 'short' }) + ' ' + date.getFullYear();
+                    matchMonth = logMonthStr === monthFilter;
+                }
+                if (personFilter) {
+                    matchPerson = log.salesPerson === personFilter;
+                }
+
+                return matchYear && matchMonth && matchPerson;
+            });
+
+            const tbody = document.getElementById('logsTableBody');
+            const emptyState = document.getElementById('emptyState');
+            tbody.innerHTML = "";
+
+            if (currentFilteredLogs.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                currentFilteredLogs.forEach(log => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-red-50/30 transition-colors";
+                    
+                    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${log.lat},${log.lng}`;
+                    const tsParts = (log.timestamp || "").split(',');
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="font-semibold text-gray-800">${tsParts[0] || ''}</div>
+                            <div class="text-xs text-gray-500">${tsParts[1] || ''}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap font-medium text-red-800">${log.salesPerson}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="font-bold text-gray-900">${log.dealerName} <span class="text-xs font-normal text-gray-400">(${log.dealerCode})</span></div>
+                            <div class="text-xs text-gray-600 mt-0.5">${log.location} | ${log.region}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="${mapUrl}" target="_blank" class="inline-flex items-center text-sm font-medium text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full transition">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                View Map
+                            </a>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        document.getElementById('filterYear').addEventListener('change', updateTable);
+        document.getElementById('filterMonth').addEventListener('change', updateTable);
+        document.getElementById('filterPerson').addEventListener('change', updateTable);
+
+        // 7. Handle Form Submission -> POST to Google Sheet
+        document.getElementById('visitForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const lat = document.getElementById('lat').value;
+            if(!lat) {
+                alert("Please click 'Capture Coordinates' to log your GPS location first.");
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Submitting...";
+
+            const now = new Date();
+            const newVisit = {
+                timestamp: now.toLocaleString(),
+                salesPerson: document.getElementById('salesPerson').value.trim(),
+                dealerName: subDealers[document.getElementById('subDealerSelect').value]['Sub Dealer Name'],
+                dealerCode: document.getElementById('dealerCode').value,
+                location: document.getElementById('dealerLocation').value,
+                region: document.getElementById('dealerRegion').value,
+                zone: document.getElementById('dealerZone').value,
+                lat: document.getElementById('lat').value,
+                lng: document.getElementById('lng').value,
+                notes: document.getElementById('notes').value
+            };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify(newVisit)
+                });
+
+                this.reset();
+                document.getElementById('lat').value = "";
+                document.getElementById('lng').value = "";
+                const status = document.getElementById('locationStatus');
+                status.textContent = "Awaiting GPS capture...";
+                status.className = "text-sm font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-md border border-gray-100";
+                
+                select.dispatchEvent(new Event('change'));
+                await fetchLogs();
+                updateTable();
+                
+                alert("✅ Visit logged successfully!");
+            } catch (err) {
+                console.error(err);
+                alert("❌ Failed to submit. Check your internet connection and try again.");
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Submit Visit Log";
+        });
+
+        // 8. Export Filtered Data to CSV
+        function exportToCSV() {
+            if(currentFilteredLogs.length === 0) {
+                alert("No data available to export based on current filters.");
+                return;
+            }
+
+            let csvContent = "Date/Time,Sales Person,Dealer Name,Dealer Code,Location,Region,Zone,Latitude,Longitude,Google Maps Link,Notes\n";
+
+            currentFilteredLogs.forEach(log => {
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${log.lat},${log.lng}`;
+                const safeNotes = log.notes ? log.notes.replace(/"/g, '""') : '';
+                
+                const row = `"${log.timestamp}","${log.salesPerson}","${log.dealerName}","${log.dealerCode}","${log.location}","${log.region}","${log.zone}","${log.lat}","${log.lng}","${mapUrl}","${safeNotes}"`;
+                csvContent += row + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            
+            const pFilter = document.getElementById('filterPerson').value || 'AllStaff';
+            const mFilter = document.getElementById('filterMonth').value.replace(' ', '') || 'AllTime';
+            link.setAttribute("download", `MarketVisits_${pFilter}_${mFilter}.csv`);
+            
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initialize UI on page load
+        (async function init() {
+            await fetchLogs();
+            updateTable();
+        })();
+    </script>
+</body>
+</html>
