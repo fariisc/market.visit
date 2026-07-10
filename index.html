@@ -31,14 +31,19 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Select Sub-Dealer <span class="text-red-500">*</span></label>
-                    <select id="subDealerSelect" required class="block w-full rounded-lg border-gray-300 bg-gray-50 border p-3 focus:bg-white focus:border-red-500 focus:ring-red-500 transition-colors shadow-sm">
-                        <option value="">-- Choose a Sub-Dealer --</option>
-                    </select>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-sm font-semibold text-gray-700">Sub-Dealer <span class="text-red-500">*</span></label>
+                        <button type="button" id="toggleManualBtn" class="text-xs font-semibold text-red-600 hover:text-red-800 underline">
+                            + Not in list? Add manually
+                        </button>
+                    </div>
+                    <input type="text" id="subDealerInput" list="subDealerList" placeholder="Type dealer name to search..." required autocomplete="off" class="block w-full rounded-lg border-gray-300 bg-gray-50 border p-3 focus:bg-white focus:border-red-500 focus:ring-red-500 transition-colors shadow-sm">
+                    <datalist id="subDealerList"></datalist>
+                    <p id="dealerMatchStatus" class="text-xs mt-1 hidden"></p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gradient-to-r from-red-50 to-white p-5 rounded-xl border border-red-100 shadow-inner">
+            <div id="autoFilledFields" class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gradient-to-r from-red-50 to-white p-5 rounded-xl border border-red-100 shadow-inner">
                 <div>
                     <label class="block text-xs font-bold text-red-400 uppercase tracking-wider mb-1">Dealer Code</label>
                     <input type="text" id="dealerCode" readonly class="block w-full bg-transparent border-none text-sm font-bold text-gray-800 p-0 focus:ring-0">
@@ -57,7 +62,32 @@
                 </div>
             </div>
 
-            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <div id="manualFields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 bg-amber-50 p-5 rounded-xl border border-amber-200">
+                <div class="md:col-span-2">
+                    <p class="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">⚠ Manual Entry — not in the sub-dealer database</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Shop / Dealer Name <span class="text-red-500">*</span></label>
+                    <input type="text" id="manualDealerName" class="block w-full rounded-lg border-amber-300 bg-white border p-2.5 text-sm focus:border-red-500 focus:ring-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Dealer Code (if any)</label>
+                    <input type="text" id="manualDealerCode" placeholder="Leave blank if none" class="block w-full rounded-lg border-amber-300 bg-white border p-2.5 text-sm focus:border-red-500 focus:ring-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Location <span class="text-red-500">*</span></label>
+                    <input type="text" id="manualDealerLocation" class="block w-full rounded-lg border-amber-300 bg-white border p-2.5 text-sm focus:border-red-500 focus:ring-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Region</label>
+                    <input type="text" id="manualDealerRegion" class="block w-full rounded-lg border-amber-300 bg-white border p-2.5 text-sm focus:border-red-500 focus:ring-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Zone</label>
+                    <input type="text" id="manualDealerZone" list="zoneList" placeholder="Type or pick existing zone" class="block w-full rounded-lg border-amber-300 bg-white border p-2.5 text-sm focus:border-red-500 focus:ring-red-500">
+                    <datalist id="zoneList"></datalist>
+                </div>
+            </div>
                 <label class="block text-sm font-semibold text-gray-700 mb-3">Real Location (GPS) <span class="text-red-500">*</span></label>
                 <div class="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
                     <button type="button" onclick="getLocation()" class="flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-700 font-bold py-2.5 px-5 rounded-lg border border-red-200 transition duration-200">
@@ -149,22 +179,264 @@
     <script>
         // Data Extraction (Combined from your paste & image extraction)
         const subDealers = [
-            {'Code': 'S00001', 'Sub Dealer Name': 'A.J ASSOCIATES', 'Location': 'NANMANDA', 'Region': 'BALUSSERY', 'Zone': 'Kozhikode North'}, 
-            {'Code': 'S00002', 'Sub Dealer Name': 'A.K TRADERS, VANIMAL', 'Location': 'VANIMAL', 'Region': 'VALAYAM', 'Zone': 'Kozhikode North'}, 
-            {'Code': 'S00003', 'Sub Dealer Name': 'ADITHYA STEELS, MEPPAYOOR', 'Location': 'MEPPAYOOR', 'Region': 'MEPPAYUR', 'Zone': 'Kozhikode North'}, 
-            {'Code': 'S00004', 'Sub Dealer Name': 'AISWARYA STEEL, KATTILPEEDIKA', 'Location': 'KATTILPEEDIKA', 'Region': 'ATHOLI', 'Zone': 'Kozhikode South'}, 
-            {'Code': 'S00005', 'Sub Dealer Name': 'AISWARYA STEEL, PARAMBATH', 'Location': 'PARAMBATH', 'Region': 'ATHOLI', 'Zone': 'Kozhikode South'}, 
-            {'Code': 'S00006', 'Sub Dealer Name': 'ALAMEEN TRADERS', 'Location': 'PALLIYATH KUNI', 'Region': 'NADUVANNUR', 'Zone': 'Kozhikode North'}, 
-            {'Code': 'S00010', 'Sub Dealer Name': 'ARIFA AGENCIES', 'Location': 'NADUVANNUR', 'Region': 'NADUVANNUR', 'Zone': 'Kozhikode North'}, 
-            {'Code': 'S00012', 'Sub Dealer Name': 'ASHAR AGENCY', 'Location': 'ATHOLI', 'Region': 'ATHOLI', 'Zone': 'Kozhikode South'}, 
-            {'Code': 'S00013', 'Sub Dealer Name': 'B.V.CEMENT AND HARDWARES', 'Location': 'MUTTANCHERRY', 'Region': 'NARIKKUNI', 'Zone': 'Kozhikode South'}, 
-            {'Code': 'S00014', 'Sub Dealer Name': 'BHARATH BUILDING MATERIALS', 'Location': 'EDACHERI', 'Region': 'ORKKATTERI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00001', 'Sub Dealer Name': 'A.J ASSOCIATES', 'Location': 'NANMANDA', 'Region': 'BALUSSERY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00002', 'Sub Dealer Name': 'A.K TRADERS, VANIMAL', 'Location': 'VANIMAL', 'Region': 'VALAYAM', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00003', 'Sub Dealer Name': 'ADITHYA STEELS, MEPPAYOOR', 'Location': 'MEPPAYOOR', 'Region': 'MEPPAYUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00004', 'Sub Dealer Name': 'AISWARYA STEEL, KATTILPEEDIKA', 'Location': 'KATTILPEEDIKA', 'Region': 'ATHOLI', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00005', 'Sub Dealer Name': 'AISWARYA STEEL, PARAMBATH', 'Location': 'PARAMBATH', 'Region': 'ATHOLI', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00006', 'Sub Dealer Name': 'ALAMEEN TRADERS', 'Location': 'PALLIYATH KUNI', 'Region': 'NADUVANNUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00010', 'Sub Dealer Name': 'ARIFA AGENCIES', 'Location': 'NADUVANNUR', 'Region': 'NADUVANNUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00012', 'Sub Dealer Name': 'ASHAR AGENCY', 'Location': 'ATHOLI', 'Region': 'ATHOLI', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00013', 'Sub Dealer Name': 'B.V.CEMENT AND HARDWARES', 'Location': 'MUTTANCHERRY', 'Region': 'NARIKKUNI', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00014', 'Sub Dealer Name': 'BHARATH BUILDING MATERIALS, EDACHERI', 'Location': 'EDACHERI', 'Region': 'ORKKATTERI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00015', 'Sub Dealer Name': 'NEW BHARATH STEEL AND CEMENT , PARAKKADAVU', 'Location': 'PARAKKADAVU', 'Region': 'IRINGANNUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00017', 'Sub Dealer Name': 'BISMI TRADERS', 'Location': 'POONOOR', 'Region': 'POONOOR', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00019', 'Sub Dealer Name': 'BURACK TRADERS', 'Location': 'PALERY', 'Region': 'KUTTIYADY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00020', 'Sub Dealer Name': 'C.K TRADERS, THALAYAD', 'Location': 'THALAYAD', 'Region': 'ENGAPUZHA', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00022', 'Sub Dealer Name': 'C.K TRADERS, EKAROOL', 'Location': 'EKAROOL', 'Region': 'BALUSSERY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00026', 'Sub Dealer Name': 'CEMENT INDIA', 'Location': 'THAMARASSERY', 'Region': 'THAMARASSERY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00027', 'Sub Dealer Name': 'CEMENT LAND, OMASSERY', 'Location': 'OMASSERY', 'Region': 'OMASSERY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00028', 'Sub Dealer Name': 'CITY TRADERS, OMASSERY', 'Location': 'OMASSERY', 'Region': 'OMASSERY', 'Zone': 'Kozhikode South'},
             {'Code': 'S00029', 'Sub Dealer Name': 'CIVIC STEEL & CEMENT', 'Location': 'KARAMPARAMBA', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00032', 'Sub Dealer Name': 'EASTERN STEEL AND CEMENT', 'Location': 'VALAYAM', 'Region': 'VALAYAM', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00035', 'Sub Dealer Name': 'EMSON STEEL, AZHIYUR', 'Location': 'AZHIYUR', 'Region': 'ORKKATTERI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00037', 'Sub Dealer Name': 'ERNAD TRADERS', 'Location': 'KOODARINJI', 'Region': 'MUKKAM', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00038', 'Sub Dealer Name': 'E.A STEELS', 'Location': 'MUKKAM', 'Region': 'MUKKAM', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00039', 'Sub Dealer Name': 'EYYAKANDY AGENCIES', 'Location': 'POTTAMAL', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00043', 'Sub Dealer Name': 'FRIENDS HARDWARE', 'Location': 'VALAYAM', 'Region': 'VALAYAM', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00044', 'Sub Dealer Name': 'GA TRADERS', 'Location': 'KARANTHOOR', 'Region': 'KUNNAMANGALAM', 'Zone': 'Kozhikode South'},
             {'Code': 'S00046', 'Sub Dealer Name': 'GLOBAL BAZAR', 'Location': 'KODUVALLY', 'Region': 'KODUVALLY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00047', 'Sub Dealer Name': 'GOLDEN HARDWARE, MALAPURAM', 'Location': 'MALAPURAM', 'Region': 'ENGAPUZHA', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00048', 'Sub Dealer Name': 'GOLDEN SANITARIES, KAITHAPOYIL', 'Location': 'KAITHAPOYIL', 'Region': 'ENGAPUZHA', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00049', 'Sub Dealer Name': 'GOLDEN STORE', 'Location': 'RAMANATTUKKARA', 'Region': 'RAMANATTUKARA', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00050', 'Sub Dealer Name': 'GRACE TRADERS', 'Location': 'KAYANNA BAZAR', 'Region': 'PERAMBRA', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00051', 'Sub Dealer Name': 'HADEED METALS', 'Location': 'VATAKARA', 'Region': 'VADAKARA', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00054', 'Sub Dealer Name': 'HI TECH STEEL', 'Location': 'THANNERPPANTHAL', 'Region': 'AYANCHERY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00055', 'Sub Dealer Name': 'INDIRA STORE', 'Location': 'KAKKATTIL', 'Region': 'NADAPURAM', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00057', 'Sub Dealer Name': 'BROTHERS AGENCIES, CHEEKILODE', 'Location': 'CHEEKILODE', 'Region': 'ATHOLI', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00058', 'Sub Dealer Name': 'JYOTHI AGENCIES, KAKKODI', 'Location': 'MOOTTOLI, KAKKODI', 'Region': 'KAKKODI', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00059', 'Sub Dealer Name': 'K.C.K STEEL & CEMENT', 'Location': 'PAYYOLI', 'Region': 'PAYYOLI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00062', 'Sub Dealer Name': 'K.V & COMPANY', 'Location': 'VADAYAM', 'Region': 'KUTTIYADY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00063', 'Sub Dealer Name': 'KAIRALI STEELS & CEMENTS, THIRUVALLOOR', 'Location': 'THIRUVALLOOR', 'Region': 'VADAKARA', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00065', 'Sub Dealer Name': 'KALATHINGAL AGENCIES', 'Location': 'CHUNGAM, FEROKE', 'Region': 'FEROKE', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00068', 'Sub Dealer Name': 'KELI CEMENTS', 'Location': 'KORANGAD', 'Region': 'THAMARASSERY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00070', 'Sub Dealer Name': 'KEYEM STEELS', 'Location': 'THOTTILPALAM', 'Region': 'KUTTIYADY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00071', 'Sub Dealer Name': 'KHALEEJ TRADING ESTABLISHMENTS', 'Location': 'AYANCHERI', 'Region': 'AYANCHERY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00074', 'Sub Dealer Name': 'KOLATHUR BUILDING MATERIALS', 'Location': 'VILLYAPPALLY', 'Region': 'VILLIAPPALLY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00077', 'Sub Dealer Name': 'KOTTAKKAL TRADERS', 'Location': 'IRINGAL, VATAKARA', 'Region': 'PAYYOLI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00079', 'Sub Dealer Name': 'KUNNUMMAL TRADERS', 'Location': 'THANNERPPANTHAL', 'Region': 'AYANCHERY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00080', 'Sub Dealer Name': 'LIBERTY TRADERS', 'Location': 'THORAYOOR', 'Region': 'PAYYOLI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00082', 'Sub Dealer Name': 'M.R STEELS, MAYYANUR', 'Location': 'MAYYANUR', 'Region': 'VILLIAPPALLY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00083', 'Sub Dealer Name': 'M.R STEELS, CHULAMAIL', 'Location': 'CHULAMAIL', 'Region': 'KUNNAMANGALAM', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00085', 'Sub Dealer Name': 'NEW MALABAR AGENCIES', 'Location': 'ELATHUR', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00086', 'Sub Dealer Name': 'MALABAR ASSOCIATES, VANIMEL', 'Location': 'VANIMEL', 'Region': 'VALAYAM', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00087', 'Sub Dealer Name': 'MALABAR HARDWARES', 'Location': 'ENGAPUZHA', 'Region': 'ENGAPUZHA', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00088', 'Sub Dealer Name': 'MANDODI TRADERS', 'Location': 'NADAPURAM ROAD, MADAPALLY', 'Region': 'ORKKATTERI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00090', 'Sub Dealer Name': 'MAS AGENCIES, KUTTYADI', 'Location': 'KUTTYADI', 'Region': 'KUTTIYADY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00091', 'Sub Dealer Name': 'MASS AGENCIES, KARUVANPOYIL', 'Location': 'KARUVANPOYIL', 'Region': 'KODUVALLY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00095', 'Sub Dealer Name': 'METRO AGENCIES', 'Location': 'MANKAVE', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00097', 'Sub Dealer Name': 'MUBARAK TRADERS', 'Location': 'NARIKUNI', 'Region': 'NARIKKUNI', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00100', 'Sub Dealer Name': 'NADUKANDIYIL TRADERS', 'Location': 'KARIYAD', 'Region': 'ORKKATTERI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00101', 'Sub Dealer Name': 'NEW LAYA ASSOCIATES', 'Location': 'POOVATTUPARAMBA', 'Region': 'POOVATTUPARAMBA', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00106', 'Sub Dealer Name': 'NV TRADERS', 'Location': 'CHALIYAM', 'Region': 'FEROKE', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00108', 'Sub Dealer Name': 'ORIENT TRADERS', 'Location': 'AREEKAD', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00111', 'Sub Dealer Name': 'PARAKOT STEEL AND CEMENTS', 'Location': 'PALAZHI', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00113', 'Sub Dealer Name': 'PARAMBATH AGRO SERVICE CENTRE', 'Location': 'AYANCHERI', 'Region': 'AYANCHERY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00115', 'Sub Dealer Name': 'PEEKEY STEELS', 'Location': 'KOYILANDY', 'Region': 'KOYILANDY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00116', 'Sub Dealer Name': 'P.M TRADERS', 'Location': 'NADAPURAM', 'Region': 'NADAPURAM', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00117', 'Sub Dealer Name': 'POPULAR AGENCIES', 'Location': 'ELETTIL VATTOLI', 'Region': 'POONOOR', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00118', 'Sub Dealer Name': 'POPULAR CEMENT AND STEEL, KODUVALLY', 'Location': 'KODUVALLY', 'Region': 'KODUVALLY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00120', 'Sub Dealer Name': 'POTHUMAPPU CEMENT BAZAR', 'Location': 'CHERUVADI', 'Region': 'MAVOOR', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00122', 'Sub Dealer Name': 'PUTHENPURAYIL TRADERS', 'Location': 'AROOR', 'Region': 'AYANCHERY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00123', 'Sub Dealer Name': 'QUALITY AGENCIES, ELETTIL VATTOLI', 'Location': 'ELETTIL VATTOLI', 'Region': 'POONOOR', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00124', 'Sub Dealer Name': 'NEW QUALITY AGENCIES, VAVAD', 'Location': 'VAVAD', 'Region': 'KODUVALLY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00125', 'Sub Dealer Name': 'RAHUL BUILDING MATERIAL', 'Location': 'EDAKKAD', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00127', 'Sub Dealer Name': 'REGENCY GENERAL TRADING', 'Location': 'KALLACHI', 'Region': 'NADAPURAM', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00128', 'Sub Dealer Name': 'ROYAL CEMENT & STEEL', 'Location': 'VATTOLI BAZAR', 'Region': 'BALUSSERY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00129', 'Sub Dealer Name': 'ROYAL TRADERS', 'Location': 'NANDI BAZAAR', 'Region': 'PAYYOLI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00130', 'Sub Dealer Name': 'S S STEEL', 'Location': 'KAINATTY', 'Region': 'ORKKATTERI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00131', 'Sub Dealer Name': 'S.G TRADERS', 'Location': 'PAYYOLI', 'Region': 'PAYYOLI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00132', 'Sub Dealer Name': 'SAGA TRADERS', 'Location': 'PARAKADAVU', 'Region': 'IRINGANNUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00133', 'Sub Dealer Name': 'SARAVANA AGENCIES', 'Location': 'CIVIL STATION', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00135', 'Sub Dealer Name': 'SM STEELS & CEMENTS', 'Location': 'KANNADIKKAL', 'Region': 'VELLIMADUKUNNU', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00137', 'Sub Dealer Name': 'STEEL MEDA', 'Location': 'PURAMERI', 'Region': 'NADAPURAM', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00138', 'Sub Dealer Name': 'STEEL PALACE, THIRUVALLUR', 'Location': 'THIRUVALLUR', 'Region': 'VADAKARA', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00147', 'Sub Dealer Name': 'THAVAKKAL TRADERS, KAKKUR', 'Location': 'KAKKUR', 'Region': 'KAKKODI', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00148', 'Sub Dealer Name': 'UNITED STEELS, PANNIYANKARA', 'Location': 'PANNIYANKARA', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00149', 'Sub Dealer Name': 'V.O STORES', 'Location': 'CHERUVANNUR, MEPPAYUR', 'Region': 'MEPPAYUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00151', 'Sub Dealer Name': 'V.K ENTERPRISES, PURAMERI', 'Location': 'PURAMERI', 'Region': 'NADAPURAM', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00152', 'Sub Dealer Name': 'V.K ENTERPRISES, CHEVAYUR', 'Location': 'CHEVAYUR', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00153', 'Sub Dealer Name': 'V.K ENTERPRISES,MALAPARAMBA', 'Location': 'MALAPARAMBA', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00155', 'Sub Dealer Name': 'V.K TRADERS, KALLACHI', 'Location': 'KALLACHI', 'Region': 'NADAPURAM', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00156', 'Sub Dealer Name': 'VILLIAPPALLY METALS', 'Location': 'VILLYAPPALLY', 'Region': 'VILLIAPPALLY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00157', 'Sub Dealer Name': 'WELCOME STEEL INDIA', 'Location': 'KIZHAL MUKKU', 'Region': 'VADAKARA', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00160', 'Sub Dealer Name': 'AADHI TRADERS', 'Location': 'PADUVILAYI', 'Region': 'ANJARAKANDY', 'Zone': 'Kannur'},
+            {'Code': 'S00162', 'Sub Dealer Name': 'ANANDA TRADERS', 'Location': 'ANJARAKKANDY', 'Region': 'ANJARAKANDY', 'Zone': 'Kannur'},
+            {'Code': 'S00163', 'Sub Dealer Name': 'ANUSHITHA ENTERPRISES', 'Location': 'CHATTUKAPARA', 'Region': 'VARAM', 'Zone': 'Kannur'},
+            {'Code': 'S00164', 'Sub Dealer Name': 'ARAFA CEMENTS, KINAVAKKAL', 'Location': 'KINAVAKKAL', 'Region': 'KUTHUPARAMBA', 'Zone': 'Kannur'},
+            {'Code': 'S00166', 'Sub Dealer Name': 'BALA TRADERS', 'Location': 'MANGATHADAM,KANNUR', 'Region': 'KUTHUPARAMBA', 'Zone': 'Kannur'},
+            {'Code': 'S00167', 'Sub Dealer Name': 'BHARATH CEMENT', 'Location': 'KATHIROOR', 'Region': 'KATHIRUR', 'Zone': 'Kannur'},
+            {'Code': 'S00168', 'Sub Dealer Name': 'BROTHERS  BUILDING MATERIALS', 'Location': 'NADAL', 'Region': 'THOTTADA', 'Zone': 'Kannur'},
+            {'Code': 'S00174', 'Sub Dealer Name': 'DHANASREE BUILDING MATERIALS SHOPPE', 'Location': 'PANNIANNUR, KANNUR', 'Region': 'CHOKLI', 'Zone': 'Kannur'},
+            {'Code': 'S00177', 'Sub Dealer Name': 'G.M TRADERS', 'Location': 'KARIKKANKULAM', 'Region': 'PAPPINISSERI', 'Zone': 'Kannur'},
+            {'Code': 'S00178', 'Sub Dealer Name': 'HADEED TRADERS', 'Location': 'THALASHERRY', 'Region': 'THALASSERY', 'Zone': 'Kannur'},
+            {'Code': 'S00179', 'Sub Dealer Name': 'HINDUSTHAN CEMENT SUPPLIERS', 'Location': 'PANOOR', 'Region': 'PANOOR', 'Zone': 'Kannur'},
+            {'Code': 'S00182', 'Sub Dealer Name': 'K.P.K TRADERS', 'Location': 'CHERUVANCHERY', 'Region': 'PANOOR', 'Zone': 'Kannur'},
+            {'Code': 'S00183', 'Sub Dealer Name': 'K.M ASSOCIATES', 'Location': 'PANERICHAL', 'Region': 'CHAKKARAKAL', 'Zone': 'Kannur'},
+            {'Code': 'S00184', 'Sub Dealer Name': 'KAIRALI TRADERS, CHALODE', 'Location': 'CHALODE', 'Region': 'CHALODE', 'Zone': 'Kannur'},
+            {'Code': 'S00185', 'Sub Dealer Name': 'KAMBIL AGENCIES', 'Location': 'KAMBIL', 'Region': 'KAMBIL', 'Zone': 'Kannur'},
+            {'Code': 'S00186', 'Sub Dealer Name': 'KANNUR STEELS', 'Location': 'THANNA', 'Region': 'KANNUR TOWN', 'Zone': 'Kannur'},
+            {'Code': 'S00188', 'Sub Dealer Name': 'KATTUMADAM STEELS', 'Location': 'VARAM, KANNUR', 'Region': 'VARAM', 'Zone': 'Kannur'},
+            {'Code': 'S00190', 'Sub Dealer Name': 'KRISHNA TRADERS, KODIYERI', 'Location': 'KODIYERI', 'Region': 'CHOKLI', 'Zone': 'Kannur'},
+            {'Code': 'S00191', 'Sub Dealer Name': 'KRISHNA TRADERS, THANNATA', 'Location': 'THANNATA, KANNUR', 'Region': 'CHALA', 'Zone': 'Kannur'},
+            {'Code': 'S00193', 'Sub Dealer Name': 'LIMSHA TRADERS', 'Location': 'KEEZHALLUR', 'Region': 'ANJARAKANDY', 'Zone': 'Kannur'},
+            {'Code': 'S00195', 'Sub Dealer Name': 'M.K INDUSTRIES', 'Location': 'CHEMBILODE', 'Region': 'CHAKKARAKAL', 'Zone': 'Kannur'},
+            {'Code': 'S00196', 'Sub Dealer Name': 'MAKRERI LABOUR SOCIETY', 'Location': 'VELLACHAL', 'Region': 'CHAKKARAKAL', 'Zone': 'Kannur'},
+            {'Code': 'S00198', 'Sub Dealer Name': 'MALABAR STEELS, PINARAYI', 'Location': 'PINARAYI', 'Region': 'MAMBARAM', 'Zone': 'Kannur'},
+            {'Code': 'S00201', 'Sub Dealer Name': 'MALABAR STEEL TRADERS, ANJARAKKANDY', 'Location': 'ANJARAKKANDY', 'Region': 'ANJARAKANDY', 'Zone': 'Kannur'},
+            {'Code': 'S00202', 'Sub Dealer Name': 'MALABAR TRADERS, CHERUPARAMBA', 'Location': 'CHERUPARAMBA', 'Region': 'PANOOR', 'Zone': 'Kannur'},
+            {'Code': 'S00203', 'Sub Dealer Name': 'MALABAR TRADERS, MATHUKOTH VARAM', 'Location': 'MATHUKOTH VARAM', 'Region': 'VARAM', 'Zone': 'Kannur'},
+            {'Code': 'S00205', 'Sub Dealer Name': 'MUBARAK ENTERPRISES, ARAYANKANDIPARA', 'Location': 'ARAYANKANDIPARA', 'Region': 'AZHIKODE', 'Zone': 'Kannur'},
+            {'Code': 'S00206', 'Sub Dealer Name': 'P.M SYNDICATE', 'Location': 'MATTANNUR', 'Region': 'MATTANNUR', 'Zone': 'Kannur'},
+            {'Code': 'S00208', 'Sub Dealer Name': 'P.K STEELS & CEMENTS', 'Location': 'CALTEX, KANNUR', 'Region': 'KANNUR TOWN', 'Zone': 'Kannur'},
+            {'Code': 'S00210', 'Sub Dealer Name': 'P.R TRADERS', 'Location': 'KATHIRUR', 'Region': 'KATHIRUR', 'Zone': 'Kannur'},
+            {'Code': 'S00212', 'Sub Dealer Name': 'PERALASSERY STEEL AGENCIES', 'Location': 'PERALASSERY', 'Region': 'MAMBARAM', 'Zone': 'Kannur'},
+            {'Code': 'S00215', 'Sub Dealer Name': 'S.R ASSOCIATES', 'Location': 'MENAPRAM, CHOKLI', 'Region': 'CHOKLI', 'Zone': 'Kannur'},
+            {'Code': 'S00218', 'Sub Dealer Name': 'SREE SREYAS TRADERS', 'Location': 'THUVAKUNNU', 'Region': 'PANOOR', 'Zone': 'Kannur'},
+            {'Code': 'S00219', 'Sub Dealer Name': 'STEEL CENTRE', 'Location': 'PANOOR', 'Region': 'PANOOR', 'Zone': 'Kannur'},
+            {'Code': 'S00220', 'Sub Dealer Name': 'SUPER STEEL CENTRE', 'Location': 'ANJARAKKANDY', 'Region': 'ANJARAKANDY', 'Zone': 'Kannur'},
+            {'Code': 'S00221', 'Sub Dealer Name': 'SUPER STEELS', 'Location': 'THALASHERRY', 'Region': 'THALASSERY', 'Zone': 'Kannur'},
+            {'Code': 'S00222', 'Sub Dealer Name': 'SURYA STEELS, PERINGATHUR', 'Location': 'PERINGATHUR', 'Region': 'IRINGANNUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00223', 'Sub Dealer Name': 'SURYA STEEL SUPPLIERS, PONNIYAM', 'Location': 'PONNIYAM', 'Region': 'KATHIRUR', 'Zone': 'Kannur'},
+            {'Code': 'S00224', 'Sub Dealer Name': 'SURYA STEELS, PANOOR', 'Location': 'PANOOR', 'Region': 'PANOOR', 'Zone': 'Kannur'},
+            {'Code': 'S00225', 'Sub Dealer Name': 'SURYA STEEL SUPPLIERS, CHOKLI', 'Location': 'CHOKLI', 'Region': 'CHOKLI', 'Zone': 'Kannur'},
+            {'Code': 'S00227', 'Sub Dealer Name': 'UDAYA TRADERS', 'Location': 'ANCHAAMPEEDIKA', 'Region': 'PAPPINISSERI', 'Zone': 'Kannur'},
+            {'Code': 'S00228', 'Sub Dealer Name': 'UNITED AGENCIES, KUDUKKIMOTTA', 'Location': 'KUDUKKIMOTTA', 'Region': 'VARAM', 'Zone': 'Kannur'},
+            {'Code': 'S00231', 'Sub Dealer Name': 'V.K TRADERS, MATTANNUR', 'Location': 'MATTANNUR', 'Region': 'MATTANNUR', 'Zone': 'Kannur'},
+            {'Code': 'S00234', 'Sub Dealer Name': 'ABALCO BUILDING SOLUTIONS', 'Location': 'AYIKKARAPADI', 'Region': 'KONDOTTY', 'Zone': 'Malappuram'},
+            {'Code': 'S00245', 'Sub Dealer Name': 'KOZHIKKODAN STEELS', 'Location': 'EDAVANNAPARA', 'Region': 'KONDOTTY', 'Zone': 'Malappuram'},
+            {'Code': 'S00254', 'Sub Dealer Name': 'PADIKKAL CEMENTS', 'Location': 'ALUNGAL', 'Region': 'KONDOTTY', 'Zone': 'Malappuram'},
+            {'Code': 'S00258', 'Sub Dealer Name': 'STAR AGENCIES, IDIMUZHIKKAL', 'Location': 'IDIMUZHIKKAL', 'Region': 'VALLIKUNNU', 'Zone': 'Malappuram'},
+            {'Code': 'S00261', 'Sub Dealer Name': 'THARAYIL STEEL AGENCIES', 'Location': 'PERINTHALMANNA', 'Region': 'PERINTHALMANNA', 'Zone': 'Malappuram'},
+            {'Code': 'S00263', 'Sub Dealer Name': 'V.K TRADERS, MALAPPURAM', 'Location': 'MALAPPURAM', 'Region': 'MALAPPURAM', 'Zone': 'Malappuram'},
+            {'Code': 'S00266', 'Sub Dealer Name': 'YEM KAY ENTERPRISES', 'Location': 'AIKKARAPADI', 'Region': 'KONDOTTY', 'Zone': 'Malappuram'},
+            {'Code': 'S00267', 'Sub Dealer Name': 'INDIAN STEEL', 'Location': 'KANNANCHEERY', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00268', 'Sub Dealer Name': 'KERALA STEEL AGENCIES', 'Location': 'VELLIMADUKUNNU', 'Region': 'VELLIMADUKUNNU', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00269', 'Sub Dealer Name': 'KUTTIKATTUR CEMENT AND STEEL', 'Location': 'KUTIKATTOOR', 'Region': 'POOVATTUPARAMBA', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00272', 'Sub Dealer Name': 'SOORYA STEEL', 'Location': 'POOKKAD', 'Region': 'ATHOLI', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00273', 'Sub Dealer Name': 'SREEKUMAR STORES', 'Location': 'CHATHAMANGALAM', 'Region': 'KUNNAMANGALAM', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00279', 'Sub Dealer Name': 'ZENITH BUILD MART', 'Location': 'PANTHEERANKAVU', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00280', 'Sub Dealer Name': 'ZENITH CEMENT & STEELS', 'Location': 'CHERUVANNUR', 'Region': 'FEROKE', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00281', 'Sub Dealer Name': 'STEEL INDIA, MAIN KOYILANDY', 'Location': 'MAIN ROAD, KOYILANDY', 'Region': 'KOYILANDY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00282', 'Sub Dealer Name': 'STEEL INDIA, BALUSSERY', 'Location': 'BALUSSERY', 'Region': 'BALUSSERY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00283', 'Sub Dealer Name': 'STEEL INDIA, THOTTILPALAM / KUTTIYADI', 'Location': 'THOTTILPALAM', 'Region': 'KUTTIYADY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00284', 'Sub Dealer Name': 'STEEL INDIA, PERAMBRA / KAITHAKKAL', 'Location': 'PERAMBRA', 'Region': 'PERAMBRA', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00285', 'Sub Dealer Name': 'STEEL INDIA, KOOTALIDA', 'Location': 'KOOTALIDA', 'Region': 'NADUVANNUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00286', 'Sub Dealer Name': 'METRO STEELS', 'Location': 'MANKAVU', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00287', 'Sub Dealer Name': 'METRO STEELS, KOLATHARA', 'Location': 'KOLATHARA', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00288', 'Sub Dealer Name': 'MUTTATHUKUNNEL HARDWARES', 'Location': 'PULLURAMPARA', 'Region': 'ENGAPUZHA', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00289', 'Sub Dealer Name': 'JANATHA STEEL MILLS PVT LTD', 'Location': 'THOTTADA, KANNUR', 'Region': 'THOTTADA', 'Zone': 'Kannur'},
+            {'Code': 'S00292', 'Sub Dealer Name': 'ZULFA AGENCIES', 'Location': 'PADANNA, CHERUVATHOOR', 'Region': 'CHERUVATHOOR', 'Zone': 'Kannur'},
+            {'Code': 'S00302', 'Sub Dealer Name': 'MALABAR TRADING CORPORATION', 'Location': 'KUTHUPARAMBA', 'Region': 'KUTHUPARAMBA', 'Zone': 'Kannur'},
+            {'Code': 'S00303', 'Sub Dealer Name': 'SURYA SALES CORPORATION', 'Location': 'IRINGANOOR', 'Region': 'IRINGANNUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00306', 'Sub Dealer Name': 'MARVEL STEEL & CEMENT', 'Location': 'ATHANIKKAL', 'Region': 'VALLIKKUNNU', 'Zone': 'Malappuram'},
+            {'Code': 'S00308', 'Sub Dealer Name': 'PARAMBATH BUILD MART, MANNIYUR', 'Location': 'MANNIYUR', 'Region': 'PAYYOLI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00309', 'Sub Dealer Name': 'A ONE STEEL AND CEMENT', 'Location': 'MAMBARAM', 'Region': 'MAMBARAM', 'Zone': 'Kannur'},
+            {'Code': 'S00312', 'Sub Dealer Name': 'KUTTIKARA TRADERS', 'Location': 'KUTTIKARA', 'Region': 'ANJARAKANDY', 'Zone': 'Kannur'},
+            {'Code': 'S00313', 'Sub Dealer Name': 'CHINGANS TRADERS', 'Location': 'KAPUMMEL', 'Region': 'MAMBARAM', 'Zone': 'Kannur'},
+            {'Code': 'S00319', 'Sub Dealer Name': 'OTHERS', 'Location': '', 'Region': '', 'Zone': 'Not Assigned'},
+            {'Code': 'S00320', 'Sub Dealer Name': 'SITE ORDER', 'Location': '', 'Region': '', 'Zone': 'Not Assigned'},
+            {'Code': 'S00331', 'Sub Dealer Name': 'ELITE STEEL', 'Location': 'CHERUVANNUR', 'Region': 'FEROKE', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00334', 'Sub Dealer Name': 'STEEL INDIA, MEENCHANDA', 'Location': 'MEENCHANDA', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00335', 'Sub Dealer Name': 'KAK STEELS & CEMENTS', 'Location': 'WANDOOR', 'Region': '', 'Zone': 'Malappuram'},
+            {'Code': 'S00340', 'Sub Dealer Name': 'ARSH TRADERS', 'Location': 'PERAMBRA', 'Region': 'PERAMBRA', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00343', 'Sub Dealer Name': 'MALABAR TRADERS, DHARMASHALA', 'Location': 'DHARMASHALA', 'Region': 'PAPPINISSERI', 'Zone': 'Kannur'},
+            {'Code': 'S00349', 'Sub Dealer Name': 'DELTA TRADERS', 'Location': 'ALAVIL', 'Region': 'AZHIKODE', 'Zone': 'Kannur'},
+            {'Code': 'S00351', 'Sub Dealer Name': 'STEEL INDIA, EAST ROAD KOYILANDI', 'Location': 'KOMATHUKARA, EAST ROAD KOYILANDI', 'Region': 'KOYILANDY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00352', 'Sub Dealer Name': 'JYOTHI TRADERS', 'Location': 'CHITTARIPARAMBA', 'Region': 'KOLAYAD', 'Zone': 'Kannur'},
+            {'Code': 'S00357', 'Sub Dealer Name': 'CEMENT LAND, VELIMANNA', 'Location': 'VELIMANNA', 'Region': 'OMASSERY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00359', 'Sub Dealer Name': 'KUNNUMMAL TRADERS, EDACHERI', 'Location': 'EDACHERI', 'Region': 'ORKKATTERI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00363', 'Sub Dealer Name': 'SANA CEMENT & STEEL', 'Location': 'KEEZHAZHIYOOR', 'Region': 'KOYILANDY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00370', 'Sub Dealer Name': 'STEEL INDIA, MOKERI', 'Location': 'MOKERI', 'Region': 'KUTTIYADY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00372', 'Sub Dealer Name': 'EXCEL TRADERS', 'Location': 'KIZHISSERY', 'Region': 'Kondotty', 'Zone': 'Malappuram'},
+            {'Code': 'S00374', 'Sub Dealer Name': 'T.K HARDWARE, PULLALOOR', 'Location': 'PULLALOOR', 'Region': 'NARIKKUNI', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00377', 'Sub Dealer Name': 'JYOTHI ENTERPRISES', 'Location': 'THILLANKERY', 'Region': 'MATTANNUR', 'Zone': 'Kannur'},
+            {'Code': 'S00379', 'Sub Dealer Name': 'C.T.A TRADERS', 'Location': 'POOKKOTTUMPADAM', 'Region': '', 'Zone': 'Malappuram'},
+            {'Code': 'S00388', 'Sub Dealer Name': 'PUTHIYODAN STORE', 'Location': 'VAZHAYOOR', 'Region': 'KONDOTTY', 'Zone': 'Malappuram'},
+            {'Code': 'S00390', 'Sub Dealer Name': 'S.K STEEL', 'Location': 'VELLIKULANGARA', 'Region': 'ORKKATTERI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00391', 'Sub Dealer Name': 'KORAMBETH BUILDMART', 'Location': 'MERUVAMBAI, KOOTHUPARAMBA', 'Region': 'KUTHUPARAMBA', 'Zone': 'Kannur'},
+            {'Code': 'S00394', 'Sub Dealer Name': 'MALABAR ASSOCIATE, PUTHOOR', 'Location': 'PUTHOOR', 'Region': 'VADAKARA', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00398', 'Sub Dealer Name': 'PARAMOUNT STEEL', 'Location': 'KANTHAPURAM', 'Region': 'POONOOR', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00400', 'Sub Dealer Name': 'MADAPPALLY TRADERS', 'Location': 'MADAPPALLY', 'Region': 'ORKKATTERI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00404', 'Sub Dealer Name': 'NATIONAL AGENCIES', 'Location': 'VALLITHODE, IRITTY', 'Region': 'IRITTY', 'Zone': 'Kannur'},
+            {'Code': 'S00409', 'Sub Dealer Name': 'TAJ STEELS', 'Location': 'KUNNUMPURAM', 'Region': 'VENGARA', 'Zone': 'Malappuram'},
+            {'Code': 'S00410', 'Sub Dealer Name': 'STEEL HOME BUILDING MATERIALS', 'Location': 'VENGALI', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00412', 'Sub Dealer Name': 'SOUTHERN TRADING COMPANY', 'Location': 'KOORACHUND', 'Region': 'PERAMBRA', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00413', 'Sub Dealer Name': 'THRIPTHI TRADERS', 'Location': 'KURUDIMUKKU, ARIKKULAM', 'Region': 'MEPPAYUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00416', 'Sub Dealer Name': 'C.K STORE', 'Location': 'POONOOR', 'Region': 'POONOOR', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00418', 'Sub Dealer Name': 'MANAMMAL AGENCIES', 'Location': 'EDARIKKODE', 'Region': 'KOTTAKKAL', 'Zone': 'Malappuram'},
+            {'Code': 'S00427', 'Sub Dealer Name': 'PANONNERI TRADERS', 'Location': 'PANONNERI, CHALA', 'Region': 'CHALA', 'Zone': 'Kannur'},
+            {'Code': 'S00430', 'Sub Dealer Name': 'ZENITH BUILDING SOLUTIONS', 'Location': 'PARAPPANANGHADI', 'Region': 'PARAPPANANGADI', 'Zone': 'Malappuram'},
+            {'Code': 'S00431', 'Sub Dealer Name': 'P.P TRADERS', 'Location': 'MOOZHIKKAL CHERUVATTA', 'Region': 'VELLIMADUKUNNU', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00435', 'Sub Dealer Name': 'K.C HARDWARES', 'Location': 'NARIKKUNI', 'Region': 'NARIKKUNI', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00438', 'Sub Dealer Name': 'R.L.C MATERIALS', 'Location': 'KALPATHUR', 'Region': 'MEPPAYUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00442', 'Sub Dealer Name': 'GATEWAY STEEL AND PIPES', 'Location': 'PERUMANNA', 'Region': 'POOVATTUPARAMBA', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00444', 'Sub Dealer Name': 'AMAAD BUILD MART', 'Location': 'KOOTHUPARAMBA', 'Region': 'KUTHUPARAMBA', 'Zone': 'Kannur'},
+            {'Code': 'S00446', 'Sub Dealer Name': 'MADATHUMBAGAM CONTRACT CO-OP SOCIETY LTD', 'Location': 'IRINGATH', 'Region': 'MEPPAYUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00450', 'Sub Dealer Name': 'BUILDON ENTERPRISES', 'Location': 'MAYANAD', 'Region': 'KUNNAMANGALAM', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00451', 'Sub Dealer Name': 'CAPITAL AGENCIES', 'Location': 'CHATHAMANGALAM, POOLAKODE', 'Region': 'MUKKAM', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00452', 'Sub Dealer Name': 'C.V.STEEL AND CEMENT', 'Location': 'ERANJIMAVU', 'Region': 'MAVOOR', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00453', 'Sub Dealer Name': 'CRESCENT STEELS', 'Location': 'CHELARI', 'Region': 'KONDOTTY', 'Zone': 'Malappuram'},
+            {'Code': 'S00454', 'Sub Dealer Name': 'OMEGA STEELS', 'Location': 'MANNUR', 'Region': 'FEROKE', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00455', 'Sub Dealer Name': 'A.K TRADERS, MUTHALAM', 'Location': 'MUTHALAM,MUKKAM', 'Region': 'OMASSERY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00457', 'Sub Dealer Name': 'SABCO BUILDMART', 'Location': 'KAIMBALAM', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00458', 'Sub Dealer Name': 'CEMENT HOUSE', 'Location': 'KARADI, THAMARASSERY', 'Region': 'THAMARASSERY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00459', 'Sub Dealer Name': 'JATHIKULATHIL HARDWARES', 'Location': 'KARIKOTTAKARI, IRITTY', 'Region': 'IRITTY', 'Zone': 'Kannur'},
+            {'Code': 'S00461', 'Sub Dealer Name': 'MALABAR ASSOCIATES,THUNERI', 'Location': 'THUNERI', 'Region': 'IRINGANNUR', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00462', 'Sub Dealer Name': 'GHANASHYAMA ASSOCIATES', 'Location': 'KANKOL,PAYYANNUR', 'Region': 'PAYYANNUR', 'Zone': 'Kannur'},
+            {'Code': 'S00463', 'Sub Dealer Name': 'ARAFA PAINTS & HARDWARE, PALLIPARAMBA', 'Location': 'PALLIPARAMBA', 'Region': '', 'Zone': 'Kannur'},
+            {'Code': 'S00464', 'Sub Dealer Name': 'A.K TRADERS, KAITHERI', 'Location': 'KAITHERI', 'Region': 'KUTHUPARAMBA', 'Zone': 'Kannur'},
+            {'Code': 'S00465', 'Sub Dealer Name': 'SHALIMAR STEELS', 'Location': 'KOLAPPURAM', 'Region': 'THIRURANGADI', 'Zone': 'Malappuram'},
+            {'Code': 'S00466', 'Sub Dealer Name': 'MALABAR TRADERS, ARIKKULAM', 'Location': 'ARIKKULAM', 'Region': 'KOYILANDY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00468', 'Sub Dealer Name': 'EMSON STEEL, KOROTH', 'Location': 'KOROTH ROAD', 'Region': 'ORKKATTERI', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00469', 'Sub Dealer Name': 'STAR BUILDING MATERIALS', 'Location': 'PUKAYOOR', 'Region': 'VENGARA', 'Zone': 'Malappuram'},
+            {'Code': 'S00470', 'Sub Dealer Name': 'STEELX BUILDING MATERIALS', 'Location': 'CHAKKARAKKAL', 'Region': '', 'Zone': 'Kannur'},
+            {'Code': 'S00471', 'Sub Dealer Name': 'NEW KOOTTAKKIL STEEL AND CEMENT', 'Location': 'KACHERIMUKKU,KODUVALLY', 'Region': 'KODUVALLY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00472', 'Sub Dealer Name': 'CLASSIC STEEL & CEMENTS', 'Location': 'PALAKUTTY,KODUVALLY', 'Region': 'KODUVALLY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00473', 'Sub Dealer Name': 'BARIA EXPORTS', 'Location': 'MADAVOOR', 'Region': 'NARIKKUNI', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00474', 'Sub Dealer Name': 'EM TRADERS', 'Location': 'KALLACHI', 'Region': 'NADAPURAM', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00475', 'Sub Dealer Name': 'GOLDEN HARDWARES, MAIKAVU', 'Location': 'MAIKAVU', 'Region': 'THAMARASSERY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00476', 'Sub Dealer Name': 'RIYA HARDWARE', 'Location': 'PAYYANAD', 'Region': 'MANJERI', 'Zone': 'Malappuram'},
+            {'Code': 'S00477', 'Sub Dealer Name': 'UNIVERSAL BUILD MART', 'Location': 'OTHUKUNGAL,MALAPPURAM', 'Region': 'MALAPPURAM', 'Zone': 'Malappuram'},
+            {'Code': 'S00478', 'Sub Dealer Name': 'C.M.T STEELS', 'Location': 'VADAPURAM', 'Region': 'NILAMBUR', 'Zone': 'Malappuram'},
+            {'Code': 'S00479', 'Sub Dealer Name': 'SAFA STEEL LINES', 'Location': 'CHIRAKKAL', 'Region': 'PAPPINISSERI', 'Zone': 'Kannur'},
+            {'Code': 'S00480', 'Sub Dealer Name': 'EVERYTHING BUILDING MATERIALS', 'Location': 'MANJERI', 'Region': 'MANJERI', 'Zone': 'Malappuram'},
+            {'Code': 'S00481', 'Sub Dealer Name': 'K.C TRADING COMPANY', 'Location': 'SREEKANDAPURAM', 'Region': '', 'Zone': 'Kannur'},
+            {'Code': 'S00482', 'Sub Dealer Name': 'THARAYITTAL STEEL & CEMENTS', 'Location': 'THARAYITTAL,VENGARA', 'Region': 'VENGARA', 'Zone': 'Malappuram'},
+            {'Code': 'S00483', 'Sub Dealer Name': 'POPULAR TOOLS, PALLIYATH', 'Location': 'PALLIYATH', 'Region': 'AYANCHERY', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00484', 'Sub Dealer Name': 'CALICUT STEEL AND CEMENT', 'Location': 'PUTHUPPADI', 'Region': 'ENGAPUZHA', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00485', 'Sub Dealer Name': 'RIYA STEELS', 'Location': 'PAVANNUR MOTTA', 'Region': '', 'Zone': 'Kannur'},
+            {'Code': 'S00486', 'Sub Dealer Name': 'ASTRO STEELS', 'Location': '43/2727 KOLATHARA ROAD', 'Region': 'KOZHIKODE CITY', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00487', 'Sub Dealer Name': 'VS TRADERS', 'Location': 'VALORA', 'Region': '', 'Zone': 'Kannur'},
+            {'Code': 'S00488', 'Sub Dealer Name': 'SAUDI STEELS', 'Location': 'PATTAMBI', 'Region': '', 'Zone': 'Malappuram South'},
+            {'Code': 'S00489', 'Sub Dealer Name': 'DELTA STEELS', 'Location': 'ALOOR', 'Region': '', 'Zone': 'Malappuram South'},
+            {'Code': 'S00490', 'Sub Dealer Name': 'SARVODAYA BUILDERS ASSOCIATES', 'Location': 'THERUR PALAYODE', 'Region': '', 'Zone': 'Kannur'},
+            {'Code': 'S00491', 'Sub Dealer Name': 'A.K HARDWARES & ELECTRICALS', 'Location': 'Meruvambayi', 'Region': '', 'Zone': 'Kannur'},
+            {'Code': 'S00492', 'Sub Dealer Name': 'AMEER\'S HITECH BUIDERS PVT LTD', 'Location': 'RAMANATTUKARA', 'Region': '', 'Zone': 'Kozhikode South'},
+            {'Code': 'S00493', 'Sub Dealer Name': 'STEEL LINE THRISSUR', 'Location': 'THRISSUR', 'Region': '', 'Zone': 'Not Assigned'},
+            {'Code': 'S00494', 'Sub Dealer Name': 'ST.MARY\'S CEMENT CENTRE PVT.LTD', 'Location': 'NADACKAL BUILDING OLD PALA RD.ETTUMANOOR', 'Region': '', 'Zone': 'Rest of Kerala'},
+            {'Code': 'S00495', 'Sub Dealer Name': 'STEEL HOUSE-KALADY', 'Location': 'KALADY', 'Region': '', 'Zone': 'Not Assigned'},
+            {'Code': 'S00496', 'Sub Dealer Name': 'STEEL HOUSE-ATHANI', 'Location': 'ATHANI', 'Region': '', 'Zone': 'Not Assigned'},
             {'Code': 'S00497', 'Sub Dealer Name': 'STEEL HOUSE-THODUPUZHA', 'Location': 'THODUPUZHA', 'Region': '', 'Zone': 'Not Assigned'},
             {'Code': 'S00498', 'Sub Dealer Name': 'WHITE LINE STEEL', 'Location': 'MANJERI', 'Region': 'MANJERI-MALAPPURAM', 'Zone': 'Malappuram North'},
             {'Code': 'S00499', 'Sub Dealer Name': 'SR STEELS', 'Location': 'GROUND FLOOR,18/467,UNIVERSITY ROAD,THOTTUNGAL,', 'Region': '', 'Zone': 'Kozhikode South'},
-            {'Code': 'S00500', 'Sub Dealer Name': 'BUILD HUB', 'Location': 'MUNDERIMOTTA', 'Region': '', 'Zone': 'Kannur'}
+            {'Code': 'S00500', 'Sub Dealer Name': 'BUILD HUB', 'Location': 'MUNDERIMOTTA', 'Region': '', 'Zone': 'Kannur'},
+            {'Code': 'S00501', 'Sub Dealer Name': 'CHEMBIL TRADERS', 'Location': 'MP 15/70,71,72 SHIVAPURAM', 'Region': '', 'Zone': 'Kannur'},
+            {'Code': 'S00502', 'Sub Dealer Name': 'P.P TRADERS', 'Location': 'V C ROAD MANANTHAVADY', 'Region': 'MANANTHAVADY-WAYANAD', 'Zone': 'Wayanad'},
+            {'Code': 'S00503', 'Sub Dealer Name': 'S.N STEELS', 'Location': 'VALANCHERY ROAD,VETTICHIRA', 'Region': 'MALAPPURAM-VETTICHIRA', 'Zone': 'Malappuram North'},
+            {'Code': 'S00504', 'Sub Dealer Name': 'METAL HUB TRADERS', 'Location': 'VENKITANGU', 'Region': '', 'Zone': 'Malappuram South'},
+            {'Code': 'S00505', 'Sub Dealer Name': 'PAIKKAT STEEL & CEMENTS', 'Location': 'PGP 13/256T,PURAMERI KUNINGAD ROAD', 'Region': '', 'Zone': 'Kozhikode North'},
+            {'Code': 'S00506', 'Sub Dealer Name': 'MA TRADERS', 'Location': 'OMASSERY,MANIPURAM', 'Region': 'KOZHIKODE SOUTH', 'Zone': 'Kozhikode South'}
         ];
 
         // >>> PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE <<<
@@ -173,33 +445,100 @@
         // Global state
         let allLogsCache = [];
         let currentFilteredLogs = [];
+        let isManualMode = false;
+        let matchedDealer = null; // holds the currently matched dealer object, or null
 
-        // 1. Populate Dealer Dropdown
-        const select = document.getElementById('subDealerSelect');
-        subDealers.forEach((dealer, index) => {
+        // 1. Populate the searchable dealer datalist + zone datalist
+        const dealerListEl = document.getElementById('subDealerList');
+        subDealers.forEach((dealer) => {
             const option = document.createElement('option');
-            option.value = index;
-            option.textContent = dealer['Sub Dealer Name'];
-            select.appendChild(option);
+            option.value = dealer['Sub Dealer Name'];
+            dealerListEl.appendChild(option);
         });
 
-        // 2. Auto-fill Data when Sub-Dealer is selected
-        select.addEventListener('change', function() {
-            if(this.value === "") {
-                document.getElementById('dealerCode').value = "";
-                document.getElementById('dealerLocation').value = "";
-                document.getElementById('dealerRegion').value = "";
-                document.getElementById('dealerZone').value = "";
+        const zoneListEl = document.getElementById('zoneList');
+        const uniqueZones = [...new Set(subDealers.map(d => d['Zone']).filter(z => z))].sort();
+        uniqueZones.forEach(zone => {
+            const option = document.createElement('option');
+            option.value = zone;
+            zoneListEl.appendChild(option);
+        });
+
+        // 2. Search-as-you-type matching against subDealers
+        const subDealerInput = document.getElementById('subDealerInput');
+        const matchStatus = document.getElementById('dealerMatchStatus');
+
+        function findDealerByName(name) {
+            const target = name.trim().toLowerCase();
+            if (!target) return null;
+            return subDealers.find(d => d['Sub Dealer Name'].trim().toLowerCase() === target) || null;
+        }
+
+        function clearAutoFilledFields() {
+            document.getElementById('dealerCode').value = "";
+            document.getElementById('dealerLocation').value = "";
+            document.getElementById('dealerRegion').value = "";
+            document.getElementById('dealerZone').value = "";
+        }
+
+        subDealerInput.addEventListener('input', function() {
+            const typed = this.value;
+            if (!typed.trim()) {
+                matchedDealer = null;
+                clearAutoFilledFields();
+                matchStatus.classList.add('hidden');
                 return;
             }
-            const selected = subDealers[this.value];
-            document.getElementById('dealerCode').value = selected['Code'];
-            document.getElementById('dealerLocation').value = selected['Location'];
-            document.getElementById('dealerRegion').value = selected['Region'];
-            document.getElementById('dealerZone').value = selected['Zone'];
+            const match = findDealerByName(typed);
+            matchedDealer = match;
+            if (match) {
+                document.getElementById('dealerCode').value = match['Code'];
+                document.getElementById('dealerLocation').value = match['Location'];
+                document.getElementById('dealerRegion').value = match['Region'];
+                document.getElementById('dealerZone').value = match['Zone'];
+                matchStatus.textContent = "✓ Matched existing dealer";
+                matchStatus.className = "text-xs mt-1 text-green-600 font-semibold";
+            } else {
+                clearAutoFilledFields();
+                matchStatus.textContent = "No exact match yet — keep typing, or use 'Add manually' if this dealer isn't listed";
+                matchStatus.className = "text-xs mt-1 text-amber-600";
+            }
         });
 
-        // 3. Geolocation API
+        // 3. Manual entry toggle
+        const toggleManualBtn = document.getElementById('toggleManualBtn');
+        const autoFilledFields = document.getElementById('autoFilledFields');
+        const manualFields = document.getElementById('manualFields');
+
+        function setManualMode(enabled) {
+            isManualMode = enabled;
+            if (enabled) {
+                subDealerInput.value = "";
+                subDealerInput.removeAttribute('required');
+                subDealerInput.classList.add('hidden');
+                document.getElementById('subDealerList').classList.add('hidden');
+                matchedDealer = null;
+                clearAutoFilledFields();
+                matchStatus.classList.add('hidden');
+                autoFilledFields.classList.add('hidden');
+                manualFields.classList.remove('hidden');
+                document.getElementById('manualDealerName').setAttribute('required', 'required');
+                document.getElementById('manualDealerLocation').setAttribute('required', 'required');
+                toggleManualBtn.textContent = "← Back to dealer search";
+            } else {
+                subDealerInput.classList.remove('hidden');
+                subDealerInput.setAttribute('required', 'required');
+                autoFilledFields.classList.remove('hidden');
+                manualFields.classList.add('hidden');
+                document.getElementById('manualDealerName').removeAttribute('required');
+                document.getElementById('manualDealerLocation').removeAttribute('required');
+                toggleManualBtn.innerHTML = "+ Not in list? Add manually";
+            }
+        }
+
+        toggleManualBtn.addEventListener('click', () => setManualMode(!isManualMode));
+
+        // 4. Geolocation API
         function getLocation() {
             const status = document.getElementById('locationStatus');
             status.textContent = "Requesting satellite fix...";
@@ -379,6 +718,35 @@
                 return;
             }
 
+            let dealerInfo;
+            if (isManualMode) {
+                const mName = document.getElementById('manualDealerName').value.trim();
+                const mLocation = document.getElementById('manualDealerLocation').value.trim();
+                if (!mName || !mLocation) {
+                    alert("Please enter at least the shop/dealer name and location for this manual entry.");
+                    return;
+                }
+                dealerInfo = {
+                    dealerName: mName,
+                    dealerCode: document.getElementById('manualDealerCode').value.trim() || "MANUAL",
+                    location: mLocation,
+                    region: document.getElementById('manualDealerRegion').value.trim(),
+                    zone: document.getElementById('manualDealerZone').value.trim()
+                };
+            } else {
+                if (!matchedDealer) {
+                    alert("Please select a valid sub-dealer from the list, or click 'Add manually' if it's not listed.");
+                    return;
+                }
+                dealerInfo = {
+                    dealerName: matchedDealer['Sub Dealer Name'],
+                    dealerCode: matchedDealer['Code'],
+                    location: matchedDealer['Location'],
+                    region: matchedDealer['Region'],
+                    zone: matchedDealer['Zone']
+                };
+            }
+
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
             submitBtn.textContent = "Submitting...";
@@ -387,19 +755,24 @@
             const newVisit = {
                 timestamp: now.toLocaleString(),
                 salesPerson: document.getElementById('salesPerson').value.trim(),
-                dealerName: subDealers[document.getElementById('subDealerSelect').value]['Sub Dealer Name'],
-                dealerCode: document.getElementById('dealerCode').value,
-                location: document.getElementById('dealerLocation').value,
-                region: document.getElementById('dealerRegion').value,
-                zone: document.getElementById('dealerZone').value,
+                dealerName: dealerInfo.dealerName,
+                dealerCode: dealerInfo.dealerCode,
+                location: dealerInfo.location,
+                region: dealerInfo.region,
+                zone: dealerInfo.zone,
                 lat: document.getElementById('lat').value,
                 lng: document.getElementById('lng').value,
                 notes: document.getElementById('notes').value
             };
 
             try {
+                // Google Apps Script often doesn't return CORS headers on POST
+                // responses, so we can't reliably read the response back.
+                // 'no-cors' avoids the browser blocking/throwing on that,
+                // and we verify success afterward by re-fetching the log list.
                 await fetch(SCRIPT_URL, {
                     method: "POST",
+                    mode: "no-cors",
                     body: JSON.stringify(newVisit)
                 });
 
@@ -409,12 +782,28 @@
                 const status = document.getElementById('locationStatus');
                 status.textContent = "Awaiting GPS capture...";
                 status.className = "text-sm font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-md border border-gray-100";
-                
-                select.dispatchEvent(new Event('change'));
+
+                matchedDealer = null;
+                clearAutoFilledFields();
+                matchStatus.classList.add('hidden');
+                setManualMode(false);
+
+                // Give the Sheet a moment to update, then re-fetch and confirm
+                await new Promise(r => setTimeout(r, 1200));
                 await fetchLogs();
                 updateTable();
-                
-                alert("✅ Visit logged successfully!");
+
+                const justSubmitted = allLogsCache.some(log =>
+                    log.salesPerson === newVisit.salesPerson &&
+                    log.dealerCode === newVisit.dealerCode &&
+                    String(log.lat) === String(newVisit.lat)
+                );
+
+                if (justSubmitted) {
+                    alert("✅ Visit logged successfully!");
+                } else {
+                    alert("⚠️ Submitted, but couldn't confirm it in the log yet. Check the table below in a few seconds, or press Refresh.");
+                }
             } catch (err) {
                 console.error(err);
                 alert("❌ Failed to submit. Check your internet connection and try again.");
